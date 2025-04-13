@@ -7,9 +7,10 @@
 </head>
 <style>
     #chatbox {
-        max-height: 80vh;
+        max-height: 70vh;
         overflow-y: auto;
     }
+
     .message {
         font-family: monospace;
     }
@@ -18,8 +19,15 @@
         font-weight: bold;
     }
 
+    .announcement {
+        font-weight: bold;
+        color: rgb(255, 191, 0);
+        padding-left: 0.1rem;
+    }
+
     .rank > img {
         vertical-align: middle;
+        padding: 0 0.1rem;
     }
 
     #buttons {
@@ -35,10 +43,7 @@
     const MESSAGES_PER_PAGE = 75
 
     const createMessage = (msg) => {
-        // Only show regular chat messages for now
-        if (msg.systemMessageType !== "NORMAL") {
-            return
-        }
+        const messageType = msg.systemMessageType;
 
         const root = document.createElement('div');
         root.className = 'message';
@@ -48,37 +53,70 @@
         timestamp.className = 'timestamp';
         const dt = new Date(Number(msg.timestamp) * 1000)
         timestamp.textContent = `[${dt.toLocaleString()}]`
+        root.appendChild(timestamp);
 
         // Rank
-        const rank = document.createElement('span');
-        rank.className = 'rank';
+        if (messageType === "NORMAL") {
+            const rank = document.createElement('span');
+            rank.className = 'rank';
 
-        const img = document.createElement('img');
-        // wiki is weird
-        if (msg.clanTitle === "Deputy Owner") {
-            msg.clanTitle = "Deputy owner"
+            const img = document.createElement('img');
+            if (msg.clanTitle === "Deputy Owner") {
+                msg.clanTitle = "Deputy owner"  // wiki is weird
+            }
+            const imageName = msg.clanTitle.replace(" ", "_")
+            img.src = `https://oldschool.runescape.wiki/images/Clan_icon_-_${imageName}.png`;
+            img.alt = msg.clanTitle;
+            img.width = 18;
+            rank.appendChild(img);
+            root.appendChild(rank);
         }
-        const imageName = msg.clanTitle.replace(" ", "_")
-        img.src = `https://oldschool.runescape.wiki/images/Clan_icon_-_${imageName}.png`;
-        img.alt = 'helper';
-        img.width = 18;
 
-        rank.appendChild(img);
+        // Ironmeme Helmets
+        let helmetImgSrc = null
+        switch (msg.accountType) {
+            case "IRON":
+                helmetImgSrc = "https://oldschool.runescape.wiki/images/Ironman_chat_badge.png";
+                break;
+            case "HARDCORE_IRON":
+                helmetImgSrc = "https://oldschool.runescape.wiki/images/Hardcore_ironman_chat_badge.png"
+                break;
+            case "ULTIMATE_IRON":
+                helmetImgSrc = "https://oldschool.runescape.wiki/images/Ultimate_ironman_chat_badge.png"
+                break;
+            case "UNRANKED_IRON":
+                helmetImgSrc = "https://oldschool.runescape.wiki/images/Unranked_group_ironman_chat_badge.png"
+                break;
+            case "GROUP_IRON":
+                helmetImgSrc = "https://oldschool.runescape.wiki/images/Group_ironman_chat_badge.png"
+                break;
+            case "HARDCORE_GROUP_IRON":
+                helmetImgSrc = "https://oldschool.runescape.wiki/images/Hardcore_group_ironman_chat_badge.png"
+                break;
+        }
+        if (helmetImgSrc !== null) {
+            const helmet = document.createElement('span');
+            helmet.className = 'rank';
+            const img = document.createElement('img');
+            img.src = helmetImgSrc;
+            img.alt = msg.accountType;
+            img.width = 18;
+            helmet.appendChild(img)
+            root.appendChild(helmet);
+        }
 
         // Author
-        const author = document.createElement('span');
-        author.className = 'author';
-        author.textContent = `${msg.author}: `
+        if (messageType === "NORMAL") {
+            const author = document.createElement('span');
+            author.className = 'author';
+            author.textContent = `${msg.author}: `
+            root.appendChild(author);
+        }
 
         // Contents
         const contents = document.createElement('span');
-        contents.className = 'contents';
+        contents.className = messageType === "NORMAL" ? "chat" : "announcement";
         contents.textContent = msg.content;
-
-        // Combine all
-        root.appendChild(timestamp);
-        root.appendChild(rank);
-        root.appendChild(author);
         root.appendChild(contents);
 
         document.getElementById('chatbox').appendChild(root);
@@ -109,7 +147,7 @@
             url.searchParams.set("from", Math.max(Number(data[0].ID) - MESSAGES_PER_PAGE, 0))
             document.getElementById("previous-link").href = url.toString();
 
-            url.searchParams.set("from",Number(data.at(-1).ID))
+            url.searchParams.set("from", Number(data.at(-1).ID))
             document.getElementById("next-link").href = url.toString();
         }).catch(console.error);
     })
