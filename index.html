@@ -93,7 +93,7 @@
 
             const url = new URL(window.location.href)
 
-            url.searchParams.set("from", Number(data[0].ID) - MESSAGES_PER_PAGE)
+            url.searchParams.set("from", Math.max(Number(data[0].ID) - MESSAGES_PER_PAGE, 0))
             document.getElementById("previous-link").href = url.toString();
 
             url.searchParams.set("from",Number(data.at(-1).ID))
