@@ -46,6 +46,8 @@
     const createMessage = (msg) => {
         const messageType = msg.systemMessageType;
 
+        if (messageType === "LOGIN") return;
+
         const root = document.createElement('div');
         root.className = 'message';
 
