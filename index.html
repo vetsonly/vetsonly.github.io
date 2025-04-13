@@ -119,7 +119,11 @@
         // Contents
         const contents = document.createElement('span');
         contents.className = messageType === "NORMAL" ? "chat" : "announcement";
-        contents.textContent = msg.content;
+        if (messageType === "COMBAT_ACHIEVEMENTS") {
+            contents.textContent = msg.content.replace(/^CA_ID:\d+\|/, '')
+        } else {
+            contents.textContent = msg.content;
+        }
         root.appendChild(contents);
 
         document.getElementById('chatbox').appendChild(root);
