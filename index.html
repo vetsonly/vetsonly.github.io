@@ -10,7 +10,6 @@
         max-height: 80vh;
         overflow-y: auto;
     }
-    
     .message {
         font-family: monospace;
     }
@@ -95,6 +94,10 @@
             return response.json()
         }).then(data => {
             data.forEach(createMessage);
+
+            // Scroll to the bottom
+            const chatbox = document.getElementById('chatbox');
+            chatbox.scrollTop = chatbox.scrollHeight;
 
             const url = new URL(window.location.href)
 
