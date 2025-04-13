@@ -65,7 +65,7 @@
             if (msg.clanTitle === "Deputy Owner") {
                 msg.clanTitle = "Deputy owner"  // wiki is weird
             }
-            const imageName = msg.clanTitle.replace(" ", "_")
+            const imageName = msg.clanTitle.replaceAll(" ", "_")
             img.src = `https://oldschool.runescape.wiki/images/Clan_icon_-_${imageName}.png`;
             img.alt = msg.clanTitle;
             img.width = 18;
