@@ -1,0 +1,115 @@
+<html lang="en-GB">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <title>Vets Only</title>
+</head>
+<style>
+    .message {
+        font-family: monospace;
+    }
+
+    .author {
+        font-weight: bold;
+    }
+
+    .rank > img {
+        vertical-align: middle;
+    }
+
+    #buttons {
+        max-width: 120px;
+    }
+
+    .navigation-link {
+        padding: 0 0.2rem;
+    }
+</style>
+<script>
+    const API_URL = "https://vetsonly.fly.dev/api/messages"
+    const MESSAGES_PER_PAGE = 75
+
+    const createMessage = (msg) => {
+        // Only show regular chat messages for now
+        if (msg.systemMessageType !== "NORMAL") {
+            return
+        }
+
+        const root = document.createElement('div');
+        root.className = 'message';
+
+        // Timestamp
+        const timestamp = document.createElement('span');
+        timestamp.className = 'timestamp';
+        const dt = new Date(Number(msg.timestamp) * 1000)
+        timestamp.textContent = `[${dt.toLocaleString()}]`
+
+        // Rank
+        const rank = document.createElement('span');
+        rank.className = 'rank';
+
+        const img = document.createElement('img');
+        // wiki is weird
+        if (msg.clanTitle === "Deputy Owner") {
+            msg.clanTitle = "Deputy owner"
+        }
+        const imageName = msg.clanTitle.replace(" ", "_")
+        img.src = `https://oldschool.runescape.wiki/images/Clan_icon_-_${imageName}.png`;
+        img.alt = 'helper';
+        img.width = 18;
+
+        rank.appendChild(img);
+
+        // Author
+        const author = document.createElement('span');
+        author.className = 'author';
+        author.textContent = `${msg.author}: `
+
+        // Contents
+        const contents = document.createElement('span');
+        contents.className = 'contents';
+        contents.textContent = msg.content;
+
+        // Combine all
+        root.appendChild(timestamp);
+        root.appendChild(rank);
+        root.appendChild(author);
+        root.appendChild(contents);
+
+        document.getElementById('chatbox').appendChild(root);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const from = urlParams.get("from")
+
+        const url = from === null ? API_URL : `${API_URL}?from=${from}`;
+
+        fetch(url).then(response => {
+            return response.json()
+        }).then(data => {
+            data.forEach(createMessage);
+
+            const url = new URL(window.location.href)
+
+            url.searchParams.set("from", Number(data[0].ID) - MESSAGES_PER_PAGE)
+            document.getElementById("previous-link").href = url.toString();
+
+            url.searchParams.set("from",Number(data.at(-1).ID))
+            document.getElementById("next-link").href = url.toString();
+        }).catch(console.error);
+    })
+</script>
+<body>
+<main class="container">
+    <h2>Chat Logs</h2>
+    <hr/>
+    <article id="chatbox"></article>
+    <div id="buttons" role="group">
+        <a href="#" class="secondary navigation-link" id="previous-link">Previous</a>
+        <a href="#" class="secondary navigation-link" id="next-link">Next</a>
+    </div>
+</main>
+</body>
+</html>
