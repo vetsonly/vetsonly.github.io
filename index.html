@@ -129,10 +129,8 @@
         document.getElementById('chatbox').appendChild(root);
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const from = urlParams.get("from")
-
+    const loadMessages = () => {
+        const from = window.location.hash ? window.location.hash.slice(1) : null;
         const url = from === null ? API_URL : `${API_URL}?from=${from}`;
 
         fetch(url).then(response => {
@@ -149,15 +147,18 @@
             chatbox.scrollTop = chatbox.scrollHeight;
 
             // Update the next and previous links
-            const url = new URL(window.location.href)
+            const url = window.location.origin + window.location.pathname;
 
-            url.searchParams.set("from", Math.max(Number(data[0].ID) - MESSAGES_PER_PAGE, 0))
-            document.getElementById("previous-link").href = url.toString();
+            const prevFrom = Math.max(Number(data[0].ID) - MESSAGES_PER_PAGE, 0)
+            document.getElementById("previous-link").href = `${url}#${prevFrom}`;
 
-            url.searchParams.set("from", Number(data.at(-1).ID))
-            document.getElementById("next-link").href = url.toString();
+            const nextFrom = Number(data.at(-1).ID)
+            document.getElementById("next-link").href = `${url}#${nextFrom}`;
         }).catch(console.error);
-    })
+    }
+
+    document.addEventListener("DOMContentLoaded", loadMessages);
+    window.addEventListener("hashchange", loadMessages);
 </script>
 <body>
 <main class="container">
