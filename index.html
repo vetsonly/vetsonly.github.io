@@ -148,6 +148,10 @@
     }
 
     const loadMessages = () => {
+        const chatbox = document.getElementById('chatbox');
+        chatbox.ariaBusy = "true";
+        chatbox.innerText = "";
+        
         const from = window.location.hash ? window.location.hash.slice(1) : null;
         const url = from === null ? API_URL : `${API_URL}?from=${from}`;
 
@@ -155,7 +159,6 @@
             return response.json()
         }).then(data => {
             // Disable loader
-            const chatbox = document.getElementById('chatbox');
             chatbox.ariaBusy = "false";
 
             // Add messages
