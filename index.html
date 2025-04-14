@@ -61,6 +61,19 @@
     const API_URL = "https://vetsonly.fly.dev/api/messages"
     const MESSAGES_PER_PAGE = 75
 
+    const createTimestamp = (unixTimestamp) => {
+        const dt = new Date(unixTimestamp * 1000)
+        const parts = new Intl.DateTimeFormat('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+        }).formatToParts(dt);
+        const getPart = (type) => parts.find(p => p.type === type)?.value;
+        return `[${getPart('day')} ${getPart('month')} ${getPart('hour')}:${getPart('minute')}]`;
+    }
+
     const createMessage = (msg) => {
         const messageType = msg.systemMessageType;
 
@@ -72,8 +85,7 @@
         // Timestamp
         const timestamp = document.createElement('span');
         timestamp.className = 'timestamp';
-        const dt = new Date(Number(msg.timestamp) * 1000)
-        timestamp.textContent = `[${dt.toLocaleString()}]`
+        timestamp.textContent = createTimestamp(Number(msg.timestamp))
         root.appendChild(timestamp);
 
         // Rank
