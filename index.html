@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta name="robots" content="noindex">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="https://vetsonly.github.io/css/main.css"/>
+    <script src="https://vetsonly.github.io/js/common.js"></script>
+    <link rel="icon" type="image/png" href="https://oldschool.runescape.wiki/images/Clan_icon_-_Owner.png"/>
+    <link rel="preload" href="https://vetsonly.github.io/fonts/RuneScape.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://vetsonly.github.io/fonts/RuneScape_Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <title>Vets Only</title>
+</head>
+<body>
+<main class="container">
+    <nav>
+    <ul>
+        <li><a class="site-logo" href="/"><strong>Chat Logs</strong></a></li>
+    </ul>
+    <ul>
+        <li><a href="/" class="contrast">Home</a></li>
+        <li><a href="https://vetsonly.github.io/search" class="contrast">Search</a></li>
+    </ul>
+</nav>
+    <hr/>
+    
+<article id="chatbox" aria-busy="true"></article>
+<div id="buttons" role="group">
+    <a href="#" class="secondary navigation-link" id="previous-link">Previous</a>
+    <a href="#" class="secondary navigation-link" id="next-link">Next</a>
+    <a href="." class="secondary navigation-link" id="latest-link">Latest</a>
+</div>
+<script>
+    const loadMessages = () => {
+        const from = window.location.hash ? window.location.hash.slice(1) : null;
+        const url = new URL("messages", API_URL);
+        if (from !== null) {
+            url.searchParams.set('from', from);
+        }
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const chatbox = document.getElementById('chatbox');
+                chatbox.innerHTML = '';
+                chatbox.ariaBusy = "false";
+
+                data.forEach(m => {
+                    const element = createMessage(m);
+                    if (element !== undefined) {
+                        document.getElementById('chatbox').appendChild(element);
+                    }
+                });
+
+                chatbox.scrollTop = chatbox.scrollHeight;
+
+                const baseUrl = window.location.origin + window.location.pathname;
+
+                const prevFrom = Math.max(Number(data[0].ID) - MESSAGES_PER_PAGE, 0);
+                document.getElementById("previous-link").href = `${baseUrl}#${prevFrom}`;
+
+                const nextFrom = Number(data.at(-1).ID);
+                document.getElementById("next-link").href = `${baseUrl}#${nextFrom}`;
+            })
+            .catch(console.error);
+    };
+
+    document.addEventListener("DOMContentLoaded", loadMessages);
+    window.addEventListener("hashchange", loadMessages);
+    document.getElementById("latest-link").addEventListener('click', (event) => {
+        event.preventDefault(); // stop the page from reloading
+        window.location.hash = ''; // clear the hash if any
+        loadMessages();
+    });
+</script>
+
+</main>
+</body>

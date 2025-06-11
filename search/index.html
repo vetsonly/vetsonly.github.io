@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta name="robots" content="noindex">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="https://vetsonly.github.io/css/main.css"/>
+    <script src="https://vetsonly.github.io/js/common.js"></script>
+    <link rel="icon" type="image/png" href="https://oldschool.runescape.wiki/images/Clan_icon_-_Owner.png"/>
+    <link rel="preload" href="https://vetsonly.github.io/fonts/RuneScape.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://vetsonly.github.io/fonts/RuneScape_Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <title>Vets Only</title>
+</head>
+<body>
+<main class="container">
+    <nav>
+    <ul>
+        <li><a class="site-logo" href="/"><strong>Chat Logs</strong></a></li>
+    </ul>
+    <ul>
+        <li><a href="/" class="contrast">Home</a></li>
+        <li><a href="https://vetsonly.github.io/search" class="contrast">Search</a></li>
+    </ul>
+</nav>
+    <hr/>
+    
+<form id="search-form">
+    <input
+            type="search"
+            name="query"
+            placeholder="Search"
+            aria-label="Search"
+    />
+</form>
+<small id="result-count"></small>
+<div id="results" aria-busy="false"></div>
+<script>
+    const createSearchResult = (msg) => {
+        const root = document.createElement('article')
+        root.className = "search-result"
+
+        const message = createMessage(msg)
+        message.removeAttribute("class");
+
+        const context = document.createElement("a");
+        context.className = "message-context";
+        context.href = `/#${msg.ID - MESSAGES_PER_PAGE + 5}`
+        context.textContent = "View context";
+        message.appendChild(context);
+
+        root.appendChild(message);
+        return root
+    }
+
+    const updateResultCount = (count) => {
+        const counter = document.getElementById("result-count");
+        counter.innerHTML = `<mark>${count} results found</mark>`;
+    }
+
+    const search = (query) => {
+        const url = new URL("search", API_URL)
+        url.searchParams.set('query', query)
+
+        const results = document.getElementById('results');
+        results.innerHTML = '';
+        results.ariaBusy = "true";
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                results.ariaBusy = "false";
+
+                data.forEach(message => {
+                    const element = createSearchResult(message);
+                    const results = document.getElementById('results')
+                    if (element !== undefined) {
+                        results.appendChild(element);
+                    }
+                });
+
+                updateResultCount(data.length);
+            })
+            .catch(e => {
+                console.error(e)
+                updateResultCount(0);
+            });
+    };
+
+    // Run once the DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('search-form');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent page reload
+
+            const formData = new FormData(form);
+            const query = formData.get('query');
+
+            search(query);
+        });
+    });
+</script>
+
+</main>
+</body>

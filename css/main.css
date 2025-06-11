@@ -1,0 +1,127 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#chatbox {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+}
+
+#results {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 0.5rem;
+}
+
+.message {
+    font-family: "RuneScape", monospace;
+    white-space: pre-wrap;
+    font-size: 1em;
+    text-shadow: 1px 1px 0 #000;
+    overflow: auto;
+}
+
+.search-result {
+    font-family: "RuneScape", monospace;
+    white-space: pre-wrap;
+    font-size: 1em;
+    text-shadow: 1px 1px 0 #000;
+    overflow: auto;
+
+    padding: 0.5em 1em;
+    margin-bottom: 0.5em;
+}
+
+/* Target mobile (devices with screen width up to 768px) */
+@media (max-width: 768px) {
+    .message {
+        font-size: 1.25em;
+    }
+}
+
+.author {
+    /*font-weight: bold;*/
+}
+
+.announcement {
+    /*font-weight: bold;*/
+    color: rgb(255, 191, 0);
+    padding-left: 0.1rem;
+}
+
+.rank > img {
+    vertical-align: middle;
+    padding: 0 0.1rem;
+    width: auto;
+    height: 1em;
+    margin-bottom: 0.3em;
+}
+
+.helmet > img {
+    vertical-align: middle;
+    padding: 0 0.1rem;
+    width: auto;
+    height: 1em;
+    margin-bottom: 0.3em;
+}
+
+#buttons {
+    max-width: 120px;
+    margin-top: 0.5rem;
+}
+
+.navigation-link {
+    padding: 0 0.2rem;
+}
+
+h2, hr {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.message-context {
+    float: right;
+}
+
+#result-count {
+    padding: 0 0 1em 0.5em;
+}
+
+#result-count > mark {
+    border-radius: 0.25em;
+}
+
+.site-logo {
+    color: var(--pico-h1-color);
+}
+
+@font-face {
+    font-family: 'RuneScape';
+    src: url('/fonts/RuneScape.woff2') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'RuneScape';
+    src: url('/fonts/RuneScape_Bold.woff2') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
